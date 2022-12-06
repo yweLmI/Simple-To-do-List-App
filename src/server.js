@@ -1,6 +1,6 @@
 import express from 'express';
 import configViewEngine from './configs/viewEngine';
-import initDBConnect from '../database';
+import initDBConnect from './configs/database';
 import {renderEditTask, editTask} from './controllers/updateTask'
 import deleteTask from './controllers/deleteTask'
 import {createTask, Render} from './controllers/createTask';
