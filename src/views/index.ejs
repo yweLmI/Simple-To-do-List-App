@@ -5,41 +5,264 @@
 <link href="https://fonts.googleapis.com/css?family=Baloo+Bhai|Candal|Chewy&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
 integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
 <body>
 <div class="todo-container">
     <h2>yweLmI's To-Do List</h2>
     <div class="todo">
-        <form action="" method="POST" class="todo-header">
-        <input type="text" name="content">
-        <button type="submit"><span class="fas fa-plus"></span></button>
+        <form action="" method="POST" class="align-items-center row mb-4 d-flex">
+            <div class="d-flex" style="width:380px">
+                <label for="content" class="me-1">Task name</label>
+                <input type="hidden" name="maxPos" id="maxPos" value="<%= totalLength+1 %>" >
+                <input type="text" placeholder="Enter task name..." name="content" id="content" onfocusout=hideIndex() onfocus=showIndex() required>
+                <label for="index" id="label_index" style="display: none; margin:0 5px;">Index</label>
+                <input type="hidden" name="index" id="index" style="width:30px" readonly>
+            </div>
+            <div class="" style="width:220px"">
+                <label for="content" class="me-0">Start at</label>
+                <input type="date" placeholder="Start at" name="create_at" id="create_at" onchange=checkMinDate() required>
+            </div>
+            <div class="" style="width:220px"">
+                <label for="content" class="me-0">End at</label>
+                <input type="date" placeholder="End at" name="end_at" id="end_at" required>
+            </div>
+            <div class="d-flex justify-content-center" style="width:800px" >
+                <% if(type==1){ %>
+                    <button type="submit" class="btn btn-primary mt-4">
+                        Submit <span class="fas fa-plus"></span>
+                        </button>
+                <% } %>
+                </div>
         </form>
-        <ul class="todo-list" id="ListTask">
-            <% todoTasks.forEach(details => { %>
-            <li class="todo-list-item" id = <%= details.position %>>
-            <div class="todo-list-item-name" ><%= details.content %></div>
-            <a href="/edit/<%= details._id %>" class="edit">
-            <span class="fas fa-edit"></span>
-            </a>
-            <a href="/remove/<%= details._id %>" class="remove">
-            <span class="fas fa-times"></span>
-            </a>
-            <% if(details.position > 1){ %>
-                <a href="/up/<%= details._id %>" class="swap">
-                    <span class="fa fa-arrow-up"></span>
-                    </a>
-              <% } %>
-            
-              <% if(details.position < todoTasks.length){ %>
-                <a href="/down/<%= details._id %>" class="swap">
-                    <span class="fa fa-arrow-down"></span>
-                    </a>
-              <% } %>
-               
-            </li>
-            <% }) %>
-            </ul>
-    </div>
-</div>
+        <div class="sort d-flex justify-content-end mb-1">
+            <a class="btn btn-success" href="/sortbydatestart/<%= current %> ">Sort by date start</a>
+            <a class="btn btn-secondary" href="/sortbydateend/<%= current %> ">Sort by date end</a>
+            <a class="btn btn-warning" href="/<%= current %>">Sort by index</a>
+        </div>
+        <table class="table table-bordered">
+            <thead>
+              <tr class="table-primary text-center">
+                <th scope="col" ><span>Index</span></th>
+                <th scope="col" ><span >Content</span></th>
+                <th scope="col" ><span >Start at</span></th>
+                <th scope="col" ><span>End at</span></th>
+                <th scope="col" ><span>Finish</span></th>
+                <th scope="col" ></th>
+                <th scope="col" ></th>
+              </tr>
+            </thead>
+            <tbody>
+                <% todoTasks.forEach(details => { %>
+                    <% if(details.finished == true) { %> 
+                        <tr style="background-color:gray ;">
+                    <% } else { %>
+                        <tr>
+                    <% } %>
+                        <th scope="row" width="40px">
+                            <div class="d-flex justify-content-center">
+                                <span> <%= curIndex +=1 %>  </span>
+                            </div>
+                        </th>
+                        <td width="200px">
+                            <div class="todo-list-item-name fw-bold d-flex justify-content-center" >
+                                <%= details.content %>
+                            </div>
+                        </td>
+                        <td width="110px">
+                            <div class="todo-list-item-name fw-bold d-flex justify-content-center" >
+                                <%= details.create_at %>
+                            </div>
+                        </td>
+                        <td width="110px">
+                            <div class="todo-list-item-name fw-bold d-flex justify-content-center" >
+                                <%= details.end_at %>
+                            </div>
+                        </td>
+                        <td width="120px">
+                            <div class="d-flex justify-content-center">
+                                <% if(details.finished == false){ %>
+                                    <a href="/finish/<%= details._id %>/<%= current %> " onclick="return confirm('Are you sure?')" class="btn btn-warning" >
+                                        <span class="fa fa-check"></span>
+                                    </a>
+                                <% } %>
+                            </div>
+                        </td>
+                        <td class="">
+                            <div class="d-flex justify-content-center">
+                                <div class="mx-auto">
+                                    <% if(details.finished == false){ %>
+                                        <a href="/edit/<%= details._id %>/<%= current %>" class="btn btn-success " >
+                                            <span class="fas fa-edit"></span>
+                                        </a>
+                                    <% } %>
+                                </div>
+                                <div class="mx-auto">
+                                    <a href="/remove/<%= details._id %>/<%= current %>" onclick="return confirm('Are you sure?')" class="btn btn-danger ">
+                                        <span class="fas fa-times"></span>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            
+                            
+                        </td>
+                        <th class="d-flex justify-content-center">
+                            <% if(details.position <maxPos &&type ==1){ %>
+                                <div class="mx-auto">
+                                    <a href="/up/<%= details._id %>/<%= current %>" class="btn btn-info mx-auto">
+                                        <span class="fa fa-arrow-up"></span>
+                                    </a>
+                                </div>
+                           
+                            <% } %>
+                            <% if(details.position >minPos &&type==1){ %>
+                                <div class="mx-auto">
+                                    <a href="/down/<%= details._id %>/<%= current %>" class="btn btn-info">
+                                        <span class="fa fa-arrow-down"></span>
+                                    </a>
+                                </div>
+                                
+                            <% } %>
+                        </th>
+                      </tr>
+                    <% }) %>
+            </tbody>
+          </table>
+          <div >
+            <!-- pagination -->
+            <div class="row ">
+                <% if(pages > 0) { %>
+                <nav class="mx-auto">
+                <ul class="pagination justify-content-center" style="margin-top: 2rem;">
+                    <!-- FIRST ITEM -->  
+                    <% if(current == 1) { %> 
+                        <li class="page-item disabled">
+                            <a class="page-link" href="/">First</a>
+                        </li>
+                    <% } else { %>
+                        <li class="page-item">
+                            <% if(type== 1) { %>
+                                <a class="page-link" href="/1">First</a>
+                            <% } %>
+                            <% if(type== 2) { %>
+                                <a class="page-link" href="sortbydatestart/1">First</a>
+                            <% } %>
+                            <% if(type== 3) { %>
+                                <a class="page-link" href="sortbydateend/1">First</a>
+                            <% } %>
+                        </li>
+                    <% } %>
+                    <!-- ITEMS  -->
+                    <% var i = (Number(current) > 3 ? Number(current) - 2 : 1) %> 
+                    <% if(i !== 1) { %>
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#">...</a>
+                        </li>
+                    <% } %>
+                    <% for(; i <= (Number(current) + 2) && i <= pages; i++) { %>
+                    <% if(i == current) { %>
+                        <li class="page-item active">
+                            <% if(type== 1) { %>
+                                <a class="page-link" href="/<%= i %>/">
+                                    <%= i %>
+                                    </a>
+                            <% } %>
+                            <% if(type== 2) { %>
+                                <a class="page-link" href="/sortbydatestart/<%= i %>/">
+                                    <%= i %>
+                                    </a>
+                            <% } %>
+                            <% if(type== 3) { %>
+                                <a class="page-link" href="/sortbydateend/<%= i %>/">
+                                    <%= i %>
+                                    </a>
+                            <% } %>
+                        </li>
+                    <% } else { %>
+                        <li class="page-item">
+                            <% if(type== 1) { %>
+                                <a class="page-link" href="/<%= i %>/">
+                                    <%= i %>
+                                    </a>
+                            <% } %>
+                            <% if(type== 2) { %>
+                                <a class="page-link" href="/sortbydatestart/<%= i %>/">
+                                    <%= i %>
+                                    </a>
+                            <% } %>
+                            <% if(type== 3) { %>
+                                <a class="page-link" href="/sortbydateend/<%= i %>/">
+                                    <%= i %>
+                                    </a>
+                            <% } %>
+                        </li>
+                    <% } %>
+                    <% if (i == Number(current) + 2 && i < pages) { %>
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#">...</a>
+                        </li>
+                    <% } %>
+                    <% } %>
+                    <!-- LAST ITEM -->
+                    <% if(current == pages) { %> 
+                
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#">
+                            Last
+                            </a>
+                        </li>
+                    <% } else { %>
+                        <li class="page-item">
+                            <% if(type== 1) { %>
+                                <a class="page-link" href="/<%= pages %>/">
+                                    Last
+                                </a>
+                            <% } %>
+                            <% if(type== 2) { %>
+                                <a class="page-link" href="/sortbydatestart/<%= pages %>/">
+                                    Last
+                                </a>
+                            <% } %>
+                            <% if(type== 3) { %>
+                                <a class="page-link" href="/sortbydateend/<%= pages %>/">
+                                    Last
+                                </a>
+                            <% } %>
+                        </li>
+                    <% } %>
+                </ul>
+                </nav>
+                <% } %>
+        </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<script>
+    var curIndex = 0;
+    
+    function checkMinDate() {
+        if(document.getElementById("create_at").value != ""){
+            var minDate = document.getElementById("create_at").value;
+            document.getElementById("end_at").setAttribute("min",minDate);
+        }
+        
+    }
+    function testalert() {
+        alert(document.getElementById("maxPos").value);
+    }
 
+    function showIndex() {
+        document.getElementById("label_index").style.display="block";
+        document.getElementById("index").setAttribute("type","number");
+        var maxPos = document.getElementById("maxPos").value;
+        document.getElementById("index").value=maxPos;
+    }
+    function hideIndex() {
+       
+        if(document.getElementById("content").value == "" ){
+            document.getElementById("index").setAttribute("type","hidden");
+            document.getElementById("label_index").style.display="none";
+        }
+        
+    }
+</script>
 </body>

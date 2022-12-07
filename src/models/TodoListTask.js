@@ -15,5 +15,17 @@ const todoTaskSchema = new mongoose.Schema({
         default: 1
        
     },
+    create_at: {
+        type: String,
+        required: true
+    },
+    end_at: {
+        type: String,
+        required: true
+    },
+    finished: {
+        type: Boolean,
+        default: false
+    },
 })
 module.exports = mongoose.model('TodoListTask',todoTaskSchema);
